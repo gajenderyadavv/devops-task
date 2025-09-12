@@ -125,14 +125,3 @@ resource "aws_ecs_service" "app" {
     Name = "ecs-app-service"
   }
 }
-
-#################
-# Outputs       #
-#################
-output "ecs_service_name" {
-  value = aws_ecs_service.app.name
-}
-
-output "ecs_task_definition" {
-  value = aws_ecs_task_definition.app.family
-}

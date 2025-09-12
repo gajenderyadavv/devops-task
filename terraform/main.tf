@@ -2,10 +2,6 @@ provider "aws" {
   region = var.aws_region
 }
 
-variable "aws_region" {
-  default = "ap-south-1"
-}
-
 # Create ECS Cluster
 resource "aws_ecs_cluster" "this" {
   name = "jenkins-ecs-cluster"

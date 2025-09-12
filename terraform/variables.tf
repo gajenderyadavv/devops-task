@@ -18,3 +18,12 @@ variable "app_image" {
   type        = string
   default     = "414508482017.dkr.ecr.us-east-1.amazonaws.com/node3:latest"
 }
+variable "app_port" {
+  description = "Port on which app container runs"
+  type        = number
+}
+
+variable "security_group" {
+  description = "Security group ID for ECS tasks"
+  type        = string
+}

@@ -28,8 +28,8 @@ resource "aws_security_group" "ecs_sg" {
   vpc_id      = var.vpc_id
 
   ingress {
-    from_port   = 9000
-    to_port     = 9000
+    from_port   = 3000
+    to_port     = 3000
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
     description = "Allow inbound app traffic"
@@ -90,8 +90,8 @@ resource "aws_ecs_task_definition" "app" {
       image = var.app_image
       portMappings = [
         {
-          containerPort = 9000
-          hostPort      = 9000
+          containerPort = 3000
+          hostPort      = 3000
           protocol      = "tcp"
         }
       ]

@@ -18,7 +18,7 @@ data "aws_subnets" "ecs_subnets" {
 resource "aws_ecs_cluster" "this" {
   name = "jenkins-ecs-cluster"
 
-  # Enable Container Insights for ECS metrics monitoring
+  # Enable Container Insights
   setting {
     name  = "containerInsights"
     value = "enabled"
@@ -76,7 +76,7 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_attach" {
 ##########################
 resource "aws_cloudwatch_log_group" "ecs_app" {
   name = "/ecs/my-app"
-  # Retention is skipped to avoid IAM issues
+  # Retention and tags skipped to avoid previous issues
 }
 
 ######################

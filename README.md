@@ -12,6 +12,7 @@
 **Step 1: Launch EC2 (Ubuntu 22.04):**
 
 - Provision an EC2 instance on AWS with Ubuntu 22.04.
+- Allocate and Associate a Elastic IP to this.
 - Connect to the instance using SSH.
 
 **Step 2: Clone the Code:**
@@ -23,7 +24,7 @@
     git clone https://github.com/gajenderyadavv/devops-task.git
     ```
 - Add Jenkins and Terraform Scripts.
-
+   
 **Step 3: Install Docker and Run the App Using a Container:**
 
 - Set up Docker on the EC2 instance:
@@ -94,14 +95,24 @@
 
 - Push any changes to the `main` branch to automatically deploy the changes in AWS ECS.
 
-- After deploying the application, setuped CloudWatch manually for monitoring and logging.
-
-- Configured log groups for your ECS tasks and attach them in the task definition.
-
-- Enabled CloudWatch metrics to monitor CPU, memory, and other ECS resource utilization.
-
-- This ensured that logs from the app containers are available for troubleshooting and monitoring system health in real time.
-
 - To get the IP address, go to the AWS ECS Console → Cluster → Tasks → Under that, you will find the Public IP.
 
 - Access `<ip address>:3000` to access your application.
+
+
+
+1. Logs (Application/Container Logs)
+-Here, ECS tasks will send their container logs to CloudWatch Logs.
+
+To view the logs: AWS Console → CloudWatch → Logs.
+
+Log group should be same corresponding to your ECS service or task definition.
+
+Opening Log stream will help in watching real-time logs from containers.
+
+2. Metrics (CPU, Memory, Network, etc.)
+-ECS services will automatically report metrics to CloudWatch Metrics.
+
+To see the metrics: AWS Console → CloudWatch → Metrics.
+
+Select ECS → Per-Cluster Metrics for viewing system statistics.

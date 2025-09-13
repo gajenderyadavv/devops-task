@@ -1,7 +1,7 @@
 # Logo Server
 
 
-TESTING webhook FOR CI/CD 
+TESTING NLB FOR ECS STATIC IP 
 
 
 A simple Express.js web server that serves the Swayatt logo image.

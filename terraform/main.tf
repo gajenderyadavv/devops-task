@@ -78,6 +78,15 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_attach" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
+
+##########################
+# CloudWatch Log Group    #
+##########################
+resource "aws_cloudwatch_log_group" "ecs_app" {
+  name              = "/ecs/my-app"
+  retention_in_days = 14
+}
+
 ######################
 # ECS Task Definition #
 ######################
@@ -137,4 +146,46 @@ resource "aws_ecs_service" "app" {
   tags = {
     Name = "ecs-app-service"
   }
+}
+
+#########################
+# CloudWatch Alarms     #
+#########################
+
+# High CPU Usage Alarm
+resource "aws_cloudwatch_metric_alarm" "ecs_cpu_high" {
+  alarm_name          = "ecs-my-app-high-cpu"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 2
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/ECS"
+  period              = 60
+  statistic           = "Average"
+  threshold           = 80
+  alarm_description   = "Alarm when ECS task CPU exceeds 80%"
+  dimensions = {
+    ClusterName = aws_ecs_cluster.this.name
+    ServiceName = aws_ecs_service.app.name
+  }
+
+  alarm_actions = [] # Add SNS topic ARN for notifications if needed
+}
+
+# High Memory Usage Alarm
+resource "aws_cloudwatch_metric_alarm" "ecs_memory_high" {
+  alarm_name          = "ecs-my-app-high-memory"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 2
+  metric_name         = "MemoryUtilization"
+  namespace           = "AWS/ECS"
+  period              = 60
+  statistic           = "Average"
+  threshold           = 80
+  alarm_description   = "Alarm when ECS task memory exceeds 80%"
+  dimensions = {
+    ClusterName = aws_ecs_cluster.this.name
+    ServiceName = aws_ecs_service.app.name
+  }
+
+  alarm_actions = [] # Add SNS topic ARN for notifications if needed
 }

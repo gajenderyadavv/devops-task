@@ -120,21 +120,22 @@ resource "aws_lb" "ecs_nlb" {
   name               = "ecs-nlb"
   internal           = false
   load_balancer_type = "network"
-  subnets            = data.aws_subnets.ecs_subnets.ids
 
   enable_deletion_protection = false
 
-  # Map Elastic IP to the first subnet
-  dynamic "subnet_mapping" {
-    for_each = [for i, subnet_id in data.aws_subnets.ecs_subnets.ids : {
-      subnet_id     = subnet_id
-      allocation_id = i == 0 ? aws_eip.ecs_lb_eip.id : null
-    }]
-    content {
-      subnet_id     = subnet_mapping.value.subnet_id
-      allocation_id = subnet_mapping.value.allocation_id
-    }
+  # Explicit subnet mappings
+  subnet_mapping {
+    subnet_id     = data.aws_subnets.ecs_subnets.ids[0]
+    allocation_id = aws_eip.ecs_lb_eip.id
   }
+
+  # If you want NLB across multiple subnets (high availability), add extra mappings without EIP
+  # subnet_mapping {
+  #   subnet_id = data.aws_subnets.ecs_subnets.ids[1]
+  # }
+  # subnet_mapping {
+  #   subnet_id = data.aws_subnets.ecs_subnets.ids[2]
+  # }
 
   tags = {
     Name = "ecs-nlb"

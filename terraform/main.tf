@@ -103,82 +103,6 @@ resource "aws_ecs_task_definition" "app" {
   }
 }
 
-###################
-# Elastic IP      #
-###################
-resource "aws_eip" "ecs_lb_eip" {
-  tags = {
-    Name = "ecs-lb-eip"
-  }
-}
-
-
-#########################
-# Network Load Balancer #
-#########################
-resource "aws_lb" "ecs_nlb" {
-  name               = "ecs-nlb"
-  internal           = false
-  load_balancer_type = "network"
-
-  enable_deletion_protection = false
-
-  # Explicit subnet mappings
-  subnet_mapping {
-    subnet_id     = data.aws_subnets.ecs_subnets.ids[0]
-    allocation_id = aws_eip.ecs_lb_eip.id
-  }
-
-  # If you want NLB across multiple subnets (high availability), add extra mappings without EIP
-  # subnet_mapping {
-  #   subnet_id = data.aws_subnets.ecs_subnets.ids[1]
-  # }
-  # subnet_mapping {
-  #   subnet_id = data.aws_subnets.ecs_subnets.ids[2]
-  # }
-
-  tags = {
-    Name = "ecs-nlb"
-  }
-}
-
-################
-# Target Group #
-################
-resource "aws_lb_target_group" "ecs_tg" {
-  name        = "ecs-tg"
-  port        = 3000
-  protocol    = "TCP"
-  vpc_id      = var.vpc_id
-  target_type = "ip" # required for Fargate
-
-  health_check {
-    protocol            = "TCP"
-    interval            = 30
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-    timeout             = 5
-  }
-
-  tags = {
-    Name = "ecs-tg"
-  }
-}
-
-#############
-# Listener  #
-#############
-resource "aws_lb_listener" "ecs_listener" {
-  load_balancer_arn = aws_lb.ecs_nlb.arn
-  port              = 3000
-  protocol          = "TCP"
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.ecs_tg.arn
-  }
-}
-
 #################
 # ECS Service   #
 #################
@@ -195,17 +119,7 @@ resource "aws_ecs_service" "app" {
     security_groups  = [aws_security_group.ecs_sg.id]
   }
 
-  load_balancer {
-    target_group_arn = aws_lb_target_group.ecs_tg.arn
-    container_name   = "app"
-    container_port   = 3000
-  }
-
-  depends_on = [
-    aws_ecs_task_definition.app,
-    aws_iam_role_policy_attachment.ecs_task_execution_role_attach,
-    aws_lb_listener.ecs_listener
-  ]
+  depends_on = [aws_ecs_task_definition.app, aws_iam_role_policy_attachment.ecs_task_execution_role_attach]
 
   tags = {
     Name = "ecs-app-service"

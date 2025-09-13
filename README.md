@@ -94,6 +94,14 @@
 
 - Push any changes to the `main` branch to automatically deploy the changes in AWS ECS.
 
+-After deploying the application, setuped CloudWatch manually for monitoring and logging.
+
+-Configured log groups for your ECS tasks and attach them in the task definition.
+
+-Enabled CloudWatch metrics to monitor CPU, memory, and other ECS resource utilization.
+
+-This ensured that logs from the app containers are available for troubleshooting and monitoring system health in real time.
+
 - To get the IP address, go to the AWS ECS Console → Cluster → Tasks → Under that, you will find the Public IP.
 
 - Access `<ip address>:3000` to access your application.

@@ -48,10 +48,6 @@ resource "aws_security_group" "ecs_sg" {
     cidr_blocks = ["0.0.0.0/0"]
     description = "Allow all outbound"
   }
-
-  tags = {
-    Name = "ecs-app-sg"
-  }
 }
 
 ##############################
@@ -62,15 +58,11 @@ resource "aws_iam_role" "ecs_task_execution_role" {
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          Service = "ecs-tasks.amazonaws.com"
-        }
-        Action = "sts:AssumeRole"
-      }
-    ]
+    Statement = [{
+      Effect = "Allow"
+      Principal = { Service = "ecs-tasks.amazonaws.com" }
+      Action    = "sts:AssumeRole"
+    }]
   })
 }
 
@@ -83,8 +75,8 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_attach" {
 # CloudWatch Log Group    #
 ##########################
 resource "aws_cloudwatch_log_group" "ecs_app" {
-  name              = "/ecs/my-app"
-  retention_in_days = 14
+  name = "/ecs/my-app"
+  # Retention is skipped to avoid IAM issues
 }
 
 ######################
@@ -119,10 +111,6 @@ resource "aws_ecs_task_definition" "app" {
       }
     }
   ])
-
-  tags = {
-    Name = "ecs-app-task"
-  }
 }
 
 #################
@@ -141,11 +129,7 @@ resource "aws_ecs_service" "app" {
     security_groups  = [aws_security_group.ecs_sg.id]
   }
 
-  depends_on = [aws_ecs_task_definition.app, aws_iam_role_policy_attachment.ecs_task_execution_role_attach]
-
-  tags = {
-    Name = "ecs-app-service"
-  }
+  depends_on = [aws_iam_role_policy_attachment.ecs_task_execution_role_attach]
 }
 
 #########################
@@ -167,8 +151,6 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_high" {
     ClusterName = aws_ecs_cluster.this.name
     ServiceName = aws_ecs_service.app.name
   }
-
-  alarm_actions = [] # Add SNS topic ARN for notifications if needed
 }
 
 # High Memory Usage Alarm
@@ -186,6 +168,4 @@ resource "aws_cloudwatch_metric_alarm" "ecs_memory_high" {
     ClusterName = aws_ecs_cluster.this.name
     ServiceName = aws_ecs_service.app.name
   }
-
-  alarm_actions = [] # Add SNS topic ARN for notifications if needed
 }
